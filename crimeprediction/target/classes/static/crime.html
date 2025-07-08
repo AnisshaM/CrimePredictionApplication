@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crime Dashboard</title>
+</head>
+<body>
+    <h1>Crime Record Entry</h1>
+    <form id="crimeForm">
+        Area: <input type="text" id="area"><br>
+        Crime Type: <input type="text" id="crimeType"><br>
+        Latitude: <input type="number" step="any" id="latitude"><br>
+        Longitude: <input type="number" step="any" id="longitude"><br>
+        Timestamp: <input type="datetime-local" id="timestamp"><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Risk Zones</h2>
+    <button onclick="getRiskZones()">Load</button>
+    <pre id="riskData"></pre>
+
+    <script>
+        document.getElementById("crimeForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            fetch("/api/crimes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    area: document.getElementById("area").value,
+                    crimeType: document.getElementById("crimeType").value,
+                    latitude: parseFloat(document.getElementById("latitude").value),
+                    longitude: parseFloat(document.getElementById("longitude").value),
+                    timestamp: document.getElementById("timestamp").value
+                })
+            })
+            .then(res => res.json())
+            .then(data => alert("Crime added!"))
+            .catch(err => console.error(err));
+        });
+
+        function getRiskZones() {
+            fetch("/api/crimes/risk-zones")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("riskData").textContent = JSON.stringify(data, null, 2);
+                });
+        }
+    </script>
+</body>
+</html>
